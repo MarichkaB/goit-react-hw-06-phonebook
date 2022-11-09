@@ -8,6 +8,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* background-color: #0a0d00;
+  background-image: url("https://transparenttextures.com/patterns/crissxcross.png"); */
+  background-color: #0a0d00;
+  background-image: url("https://transparenttextures.com/patterns/escheresque-dark.png");
+
 }
 
 code {
@@ -29,6 +34,8 @@ ul,
 ol {
   margin: 0;
   padding: 0;
+  list-style: none;
+
 }
 
 img {

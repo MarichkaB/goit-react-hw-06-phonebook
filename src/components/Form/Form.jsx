@@ -1,42 +1,63 @@
-import { Component } from 'react';
-import s from './Form.module.css';
+import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
+import { toast } from 'react-toastify';
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact } from 'redux/actions/action-contacts';
+import s from './Form.module.css';
 
-class Form extends Component {
-  state = {
-    name: '',
-    number: '',
+export const Form = () => {
+  const contacts = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+
+  const handleInputChange = evt => {
+    const { name } = evt.currentTarget;
+    const { value } = evt.currentTarget;
+
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+
+      case 'number':
+        setNumber(value);
+        break;
+
+      default:
+        break;
+    }
   };
 
-  handleInputChange = evt => {
-    const { name, value } = evt.currentTarget;
-    this.setState({ [name]: value });
-  };
-
-  handleFormSubmit = evt => {
+  const handleFormSubmit = evt => {
     evt.preventDefault();
-    const profile = { id: nanoid(3), ...this.state };
-    this.props.onFormSubmit(profile);
-    this.formReset();
+    const profile = { id: nanoid(3), name, number };
+    const nameToCheck = profile.name.toLocaleLowerCase();
+    const isIncludeName = contacts.some(
+      contact => contact.name.toLocaleLowerCase() === nameToCheck
+    );
+    if (isIncludeName) {
+      toast.warn(`${profile.name} is already in contacts`, { autoClose: 2000 });
+      return;
+    }
+    dispatch(addContact(profile));
+    formReset();
   };
 
-  formReset() {
-    this.setState({
-      name: '',
-      number: '',
-    });
-  }
+  const formReset = () => {
+    setName('');
+    setNumber('');
+  };
 
-  render() {
-    const { name, number } = this.state;
-    return (
-      <form className={s.form} onSubmit={this.handleFormSubmit}>
-        <label className="form_name">
+  return (
+    <div>
+      <form className={s.form} onSubmit={handleFormSubmit}>
+        <label className={s.form_name}>
           Name
           <input
             className={s.form_input}
             value={name}
-            onChange={this.handleInputChange}
+            onChange={handleInputChange}
             type="text"
             name="name"
             pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
@@ -44,12 +65,12 @@ class Form extends Component {
             required
           />
         </label>
-        <label className="form__phone">
+        <label className={s.form_name}>
           Number
           <input
             className={s.form_input}
             value={number}
-            onChange={this.handleInputChange}
+            onChange={handleInputChange}
             type="tel"
             name="number"
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
@@ -57,12 +78,10 @@ class Form extends Component {
             required
           />
         </label>
-        <button className={s.form_btn} type="submit">
+        <button className={s.form_button} type="submit">
           Add contact
         </button>
       </form>
-    );
-  }
-}
-
-export default Form;
+    </div>
+  );
+};
